@@ -310,7 +310,7 @@ stock ProcessIgnore(client, const bool:chat = false, const bool:voice = false, c
         bTargetAll = true;
     }
 
-    Target[buffersize] = ProcessTargetString(Target[arg], client, Target[buffer], MAXPLAYERS, COMMAND_FILTER_CONNECTED|COMMAND_FILTER_NO_IMMUNITY, Target[targetname], MAX_TARGET_LENGTH, Target[tn_is_ml]);
+    Target[buffersize] = ProcessTargetString(Target[arg], client, Target[buffer], MAXPLAYERS, COMMAND_FILTER_CONNECTED|COMMAND_FILTER_NO_BOTS|COMMAND_FILTER_NO_IMMUNITY, Target[targetname], MAX_TARGET_LENGTH, Target[tn_is_ml]);
 
     if (Target[buffersize] <= 0)
     {
