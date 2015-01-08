@@ -1,50 +1,32 @@
 /*
-Ignore List
-By: Chdata
-
-TODO:
-sm_ignore
-argc < 1 = view a list of usernames
-else ignore the name that was typed
-
-Choose a player
-1. name
-2. name
-3. name
-
-USER's ignore status (select to toggle)
-1. Chat (ignored)
-2. Mic (visible)
-3. Voice commands (visible)
+    Ignore List
+    By: Chdata
 
 
-sm_block
+    This is what I plan to follow for the cvar determining how people see "You are being ignored"
 
-This is for the cvar determining how people see "You are being ignored"
+    // Specifies how admin activity should be relayed to users.  Add up the values
+    // below to get the functionality you want.
+    // 1: Show admin activity to non-admins anonymously.
+    // 2: If 1 is specified, admin names will be shown.
+    // 4: Show admin activity to admins anonymously.
+    // 8: If 4 is specified, admin names will be shown.
+    // 16: Always show admin names to root users.
+    // --
+    // Default: 13 (1+4+8) 14 for players to see names
+    sm_show_activity 13
 
-// Specifies how admin activity should be relayed to users.  Add up the values
-// below to get the functionality you want.
-// 1: Show admin activity to non-admins anonymously.
-// 2: If 1 is specified, admin names will be shown.
-// 4: Show admin activity to admins anonymously.
-// 8: If 4 is specified, admin names will be shown.
-// 16: Always show admin names to root users.
-// --
-// Default: 13 (1+4+8) 14 for players to see names
-sm_show_activity 13
+    This is for who you can target with the ignore list
 
-This is for who you can target with the ignore list
-
-// Sets how SourceMod should check immunity levels when administrators target 
-// each other.
-// 0: Ignore immunity levels (except for specific group immunities).
-// 1: Protect from admins of lower access only.
-// 2: Protect from admins of equal to or lower access.
-// 3: Same as 2, except admins with no immunity can affect each other.
-// --
-// Default: 1
-sm_immunity_mode 1
-
+    // Sets how SourceMod should check immunity levels when administrators target 
+    // each other.
+    // 0: Ignore immunity levels (except for specific group immunities).
+    // 1: Protect from admins of lower access only.
+    // 2: Protect from admins of equal to or lower access.
+    // 3: Same as 2, except admins with no immunity can affect each other.
+    // --
+    // Default: 1
+    sm_immunity_mode 1
 */
 
 #pragma semicolon 1
@@ -98,46 +80,17 @@ public OnPluginStart()
     RegConsoleCmd("sm_block",    Command_Ignore,   "Usage: sm_block <#userid|name> | Set target's communications to be ignored.");
     RegConsoleCmd("sm_unignore", Command_UnIgnore, "Usage: sm_unignore <#userid|name> | Unignore target.");
     RegConsoleCmd("sm_unblock",  Command_UnIgnore, "Usage: sm_unblock <#userid|name> | Unignore target.");
-
-    /*RegConsoleCmd("sm_ignore_chat", Command_IgnoreChat, "Usage: sm_ignorec <#userid|name>\nSet target's chat to be ignored.");
-    RegConsoleCmd("sm_ignore_voice", Command_IgnoreVoice, "Usage: sm_ignorev <#userid|name>\nSet target's voice to be ignored.");
-    RegConsoleCmd("sm_ignorechat", Command_IgnoreChat, "Usage: sm_ignorec <#userid|name>\nSet target's chat to be ignored.");
-    RegConsoleCmd("sm_ignorevoice", Command_IgnoreVoice, "Usage: sm_ignorev <#userid|name>\nSet target's voice to be ignored.");
-    RegConsoleCmd("sm_ignore_c", Command_IgnoreChat, "Usage: sm_ignorec <#userid|name>\nSet target's chat to be ignored.");
-    RegConsoleCmd("sm_ignore_v", Command_IgnoreVoice, "Usage: sm_ignorev <#userid|name>\nSet target's voice to be ignored.");
-    RegConsoleCmd("sm_ignorec", Command_IgnoreChat, "Usage: sm_ignorec <#userid|name>\nSet target's chat to be ignored.");
-    RegConsoleCmd("sm_ignorev", Command_IgnoreVoice, "Usage: sm_ignorev <#userid|name>\nSet target's voice to be ignored.");
-    RegConsoleCmd("sm_ignore", Command_Ignore, "Usage: sm_ignore <#userid|name>\nSet target's chat and voice to be ignored.");
-
-    RegConsoleCmd("sm_unignore_chat", Command_UnIgnoreChat, "Usage: sm_unignorec <#userid|name>\nUnignore target's chat.");
-    RegConsoleCmd("sm_unignore_voice", Command_UnIgnoreVoice, "Usage: sm_unignorev <#userid|name>\nUnignore target's voice.");
-    RegConsoleCmd("sm_unignorechat", Command_UnIgnoreChat, "Usage: sm_unignorec <#userid|name>\nUnignore target's chat.");
-    RegConsoleCmd("sm_unignorevoice", Command_UnIgnoreVoice, "Usage: sm_unignorev <#userid|name>\nUnignore target's voice.");
-    RegConsoleCmd("sm_unignore_c", Command_UnIgnoreChat, "Usage: sm_unignorec <#userid|name>\nUnignore target's chat.");
-    RegConsoleCmd("sm_unignore_v", Command_UnIgnoreVoice, "Usage: sm_unignorev <#userid|name>\nUnignore target's voice.");
-    RegConsoleCmd("sm_unignorec", Command_UnIgnoreChat, "Usage: sm_unignorec <#userid|name>\nUnignore target's chat.");
-    RegConsoleCmd("sm_unignorev", Command_UnIgnoreVoice, "Usage: sm_unignorev <#userid|name>\nUnignore target's voice.");
-    RegConsoleCmd("sm_unignore", Command_UnIgnore, "Usage: sm_unignore <#userid|name>\nUnignore target.");*/
 }
 
-/*
-    Check for necessary plugin dependencies and shut down this plugin if not found.
-
-*/
-public OnAllPluginsLoaded()
+public OnAllPluginsLoaded()                     //  Check for necessary plugin dependencies and shut down this plugin if not found.
 {
     if (!LibraryExists("scp"))
     {
         SetFailState("Simple Chat Processor is not loaded. It is required for this plugin to work.");
-        //g_bEnabled = false; // No real reason to do this because SetFailState pauses the plugin anyway
     }
 }
 
-/*
-    Enable the plugin if the necessary library is added
-
-*/
-public OnLibraryAdded(const String:name[])
+public OnLibraryAdded(const String:name[])      //  Enable the plugin if the necessary library is added
 {
     if (StrEqual(name, "scp"))
     {
@@ -145,16 +98,10 @@ public OnLibraryAdded(const String:name[])
     }
 }
 
-/*
-    If a necessary plugin is removed, also shut this one down.
-
-*/
-public OnLibraryRemoved(const String:name[])
+public OnLibraryRemoved(const String:name[])    //  If a necessary plugin is removed, also shut this one down.
 {
     if (StrEqual(name, "scp"))
     {
-        //SetFailState("Simple Chat Processor Unloaded. Plugin Disabled.");     // This is really god damn awful to do because it error logs almost every time the map changes
-        //LogMessage("Simple Chat Processor Unloaded. Plugin Disabled.");       // No real reason to play a message though
         g_bEnabled = false;
     }
 }
@@ -444,10 +391,7 @@ stock bool:IsValidClient(iClient)
     return (0 < iClient && iClient <= MaxClients && IsClientInGame(iClient));
 }
 
-/*
-Sets up a native to send whether or not a client is ignoring a specific target's chat
-
-*/
+//  Sets up a native to send whether or not a client is ignoring a specific target's chat
 public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
 {
     CreateNative("GetIgnoreMatrix", Native_GetIgnoreMatrix);
@@ -457,81 +401,11 @@ public APLRes:AskPluginLoad2(Handle:myself, bool:late, String:error[], err_max)
     return APLRes_Success;
 }
 
-/*
-The native itself
-
-*/
+//  The native itself
 public Native_GetIgnoreMatrix(Handle:plugin, numParams)
 {
     new client = GetNativeCell(1);
     new target = GetNativeCell(2);
 
     return IgnoreMatrix[client][target][Chat];
-}
-
-#endinput
-
-public Action:Command_IgnoreChat(client, argc)
-{
-    if (argc == 0)
-    {
-        ReplyToCommand(client, "Usage: sm_ignorec <#userid|name>");
-        return Plugin_Handled;
-    }
-    
-    ProcessIgnore(client, true, _, 1);
-
-    return Plugin_Handled;
-}
-
-public Action:Command_IgnoreVoice(client, argc)
-{
-    if (argc == 0)
-    {
-        ReplyToCommand(client, "Usage: sm_ignorev <#userid|name>");
-        return Plugin_Handled;
-    }
-
-    ProcessIgnore(client, _, true, 2);
-
-    return Plugin_Handled;
-}
-
-public Action:Command_UnIgnore(client, argc)
-{
-    if (argc == 0)
-    {
-        ReplyToCommand(client, "Usage: sm_unignore <#userid|name>, sm_unignorec chat only, sm_unignorev voice only");
-        return Plugin_Handled;
-    }
-    
-    ProcessIgnore(client, false, false, 3);
-
-    return Plugin_Handled;
-}
-
-public Action:Command_UnIgnoreChat(client, argc)
-{
-    if (argc == 0)
-    {
-        ReplyToCommand(client, "Usage: sm_unignorec <#userid|name>");
-        return Plugin_Handled;
-    }
-    
-    ProcessIgnore(client, false, _, 1);
-
-    return Plugin_Handled;
-}
-
-public Action:Command_UnIgnoreVoice(client, argc)
-{
-    if (argc == 0)
-    {
-        ReplyToCommand(client, "Usage: sm_unignorev <#userid|name>");
-        return Plugin_Handled;
-    }
-
-    ProcessIgnore(client, _, false, 2);
-
-    return Plugin_Handled;
 }
