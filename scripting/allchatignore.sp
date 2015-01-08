@@ -33,16 +33,16 @@
 //#include <updater>
 
 /* Plugin Info */
-#define PLUGIN_NAME "AllChat"
-#define PLUGIN_VERSION "1.1.1"
+#define PLUGIN_NAME "AllChatIgnore"
+#define PLUGIN_VERSION "0x03"
 
 public Plugin:myinfo =
 {
     name = PLUGIN_NAME,
-    author = "Frenzzy",
-    description = "Relays chat messages to all players",
+    author = "Frenzzy & Chdata",
+    description = "Relays chat messages to all players - supports /ignore",
     version = PLUGIN_VERSION,
-    url = "http://forums.alliedmods.net/showthread.php?p=1593727"
+    url = "https://forums.alliedmods.net/showthread.php?p=2091299"
 };
 
 /* Globals */
@@ -62,6 +62,8 @@ new String:g_msgName[64];
 new String:g_msgText[512];
 new bool:g_msgIsTeammate;
 new bool:g_msgTarget[MAXPLAYERS + 1];
+
+static bool:g_bEnabled = false;
 
 public OnPluginStart()
 {
@@ -107,6 +109,7 @@ public OnAllPluginsLoaded()
     if (!LibraryExists("ignorematrix"))
     {
         SetFailState("Need ignorematrix to run this plugin.");
+        //g_bEnabled = false; // No real reason to do this because SetFailState pauses the plugin anyway
     }
 }
 
@@ -118,17 +121,23 @@ public OnLibraryRemoved(const String:name[])
 {
     if (StrEqual(name, "ignorematrix"))
     {
-        SetFailState("Need ignorematrix to run this plugin.");
+        //SetFailState("Need ignorematrix to run this plugin.");
+        g_bEnabled = false;
     }
 }
 
-/*public OnLibraryAdded(const String:name[])
+public OnLibraryAdded(const String:name[])
 {
-    if (StrEqual(name, "updater"))
+    if (StrEqual(name, "ignorematrix"))
+    {
+        g_bEnabled = true;
+    }
+
+    /*if (StrEqual(name, "updater"))
     {
         Updater_AddPlugin(UPDATE_URL);
-    }
-}*/
+    }*/
+}
 
 public OnVersionChanged(Handle:convar, const String:oldValue[], const String:newValue[])
 {
@@ -140,6 +149,8 @@ public OnVersionChanged(Handle:convar, const String:oldValue[], const String:new
 
 public Action:Hook_UserMessage(UserMsg:msg_id, Handle:bf, const players[], playersNum, bool:reliable, bool:init)
 {
+    if (!g_bEnabled) return Plugin_Continue;
+
     g_msgAuthor = BfReadByte(bf);
     g_msgIsChat = bool:BfReadByte(bf);
     BfReadString(bf, g_msgType, sizeof(g_msgType), false);
@@ -150,10 +161,14 @@ public Action:Hook_UserMessage(UserMsg:msg_id, Handle:bf, const players[], playe
     {
         g_msgTarget[players[i]] = false;
     }
+
+    return Plugin_Continue;
 }
 
 public Action:Event_PlayerSay(Handle:event, const String:name[], bool:dontBroadcast)
 {
+    if (!g_bEnabled) return;
+
     new mode = GetConVarInt(g_hCvarMode);
     
     if (mode < 1)
@@ -228,6 +243,8 @@ public Action:Event_PlayerSay(Handle:event, const String:name[], bool:dontBroadc
 
 public Action:Command_Say(client, const String:command[], argc)
 {
+    if (!g_bEnabled) return Plugin_Continue;
+
     for (new target = 1; target <= MaxClients; target++)
     {
         g_msgTarget[target] = true;
