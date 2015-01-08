@@ -283,7 +283,8 @@ public MenuHandler_IgnoreList(Handle:hMenu, MenuAction:iAction, iClient, iParam)
                     case 0: which |= 1;
                     case 1: which |= 2;
                 }
-                ToggleIgnoreStatus(iClient, iTarget, iParam == 0, iParam == 1, which, false);
+                ToggleIgnoreStatus(iClient, iTarget, !IgnoreMatrix[iClient][iTarget][Chat], !IgnoreMatrix[iClient][iTarget][Voice], which, false);
+                Menu_IgnoreList(iClient, iTarget);
             }
         }
         case MenuAction_End:
@@ -338,6 +339,11 @@ stock ProcessIgnore(client, const bool:chat = false, const bool:voice = false, c
     return;
 }
 
+/*
+    @chat says what we're toggling the status to
+    @voice says what we're toggling the status to
+    @which says which of the above we actually are effecting
+*/
 ToggleIgnoreStatus(const client, const target, const bool:chat, const bool:voice, const which, const bool:bTargetAll)
 {
     if (GetUserFlagBits(target) & ADMFLAG_SLAY)
