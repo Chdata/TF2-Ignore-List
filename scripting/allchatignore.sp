@@ -29,8 +29,6 @@
 /* SM Includes */
 #include <sourcemod>
 #include <ignore>
-//#undef REQUIRE_PLUGIN
-//#include <updater>
 
 /* Plugin Info */
 #define PLUGIN_NAME "AllChatIgnore"
@@ -44,9 +42,6 @@ public Plugin:myinfo =
     version = PLUGIN_VERSION,
     url = "https://forums.alliedmods.net/showthread.php?p=2091299"
 };
-
-/* Globals */
-//#define UPDATE_URL "http://vsdir.com/sm/allchat/update.txt"
 
 /* Convars */
 new Handle:g_hCvarVersion = INVALID_HANDLE;
@@ -92,36 +87,29 @@ public OnPluginStart()
     // Commands.
     AddCommandListener(Command_Say, "say");
     AddCommandListener(Command_Say, "say_team");
-    
-    // Updater.
-    /*if (LibraryExists("updater"))
-    {
-        Updater_AddPlugin(UPDATE_URL);
-    }*/
 }
 
 /*
-Check for necessary plugin dependencies and shut down this plugin if not found.
+    Check for necessary plugin dependencies and shut down this plugin if not found.
 
 */
 public OnAllPluginsLoaded()
 {
     if (!LibraryExists("ignorematrix"))
     {
-        //SetFailState("Need ignorematrix to run this plugin."); // This will cause pointless error logs to pop up, pretty annoying.
-        g_bEnabled = false;
+        SetFailState("Need ignorematrix to run this plugin.");
+        //g_bEnabled = false;
     }
 }
 
 /*
-If a necessary plugin is removed, also shut this one down.
+    If a necessary plugin is removed, also shut this one down.
 
 */
 public OnLibraryRemoved(const String:name[])
 {
     if (StrEqual(name, "ignorematrix"))
     {
-        //SetFailState("Need ignorematrix to run this plugin.");
         g_bEnabled = false;
     }
 }
@@ -132,11 +120,6 @@ public OnLibraryAdded(const String:name[])
     {
         g_bEnabled = true;
     }
-
-    /*if (StrEqual(name, "updater"))
-    {
-        Updater_AddPlugin(UPDATE_URL);
-    }*/
 }
 
 public OnVersionChanged(Handle:convar, const String:oldValue[], const String:newValue[])
