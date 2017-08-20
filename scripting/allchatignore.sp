@@ -34,7 +34,7 @@
 
 /* Plugin Info */
 #define PLUGIN_NAME "AllChatIgnore"
-#define PLUGIN_VERSION "0x03"
+#define PLUGIN_VERSION "0x04"
 
 public Plugin:myinfo =
 {
@@ -108,8 +108,8 @@ public OnAllPluginsLoaded()
 {
     if (!LibraryExists("ignorematrix"))
     {
-        SetFailState("Need ignorematrix to run this plugin.");
-        //g_bEnabled = false; // No real reason to do this because SetFailState pauses the plugin anyway
+        //SetFailState("Need ignorematrix to run this plugin."); // This will cause pointless error logs to pop up, pretty annoying.
+        g_bEnabled = false;
     }
 }
 
