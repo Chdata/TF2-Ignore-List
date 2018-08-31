@@ -34,7 +34,7 @@
 #include <sdktools>
 #include <scp>
 
-#define PLUGIN_VERSION "0x03"
+#define PLUGIN_VERSION "0x04"
 
 public Plugin:myinfo =
 {
@@ -71,7 +71,7 @@ public OnPluginStart()
     CreateConVar(
         "sm_ignorelist_version", PLUGIN_VERSION,
         "Ignore List Version",
-        FCVAR_REPLICATED|FCVAR_PLUGIN|FCVAR_SPONLY|FCVAR_DONTRECORD|FCVAR_NOTIFY
+        FCVAR_NOTIFY|FCVAR_DONTRECORD|FCVAR_CHEAT
     );
 
     LoadTranslations("common.phrases");
@@ -80,6 +80,26 @@ public OnPluginStart()
     RegConsoleCmd("sm_block",    Command_Ignore,   "Usage: sm_block <#userid|name> | Set target's communications to be ignored.");
     RegConsoleCmd("sm_unignore", Command_UnIgnore, "Usage: sm_unignore <#userid|name> | Unignore target.");
     RegConsoleCmd("sm_unblock",  Command_UnIgnore, "Usage: sm_unblock <#userid|name> | Unignore target.");
+
+    RegConsoleCmd("sm_ignore_chat", Command_IgnoreChat, "Usage: sm_ignorec <#userid|name> | Set target's chat to be ignored.");
+    RegConsoleCmd("sm_ignorechat", Command_IgnoreChat, "Usage: sm_ignorec <#userid|name> | Set target's chat to be ignored.");
+    RegConsoleCmd("sm_ignore_c", Command_IgnoreChat, "Usage: sm_ignorec <#userid|name> | Set target's chat to be ignored.");
+    RegConsoleCmd("sm_ignorec", Command_IgnoreChat, "Usage: sm_ignorec <#userid|name> | Set target's chat to be ignored.");
+
+    RegConsoleCmd("sm_ignore_voice", Command_IgnoreVoice, "Usage: sm_ignorev <#userid|name> | Set target's voice to be ignored.");
+    RegConsoleCmd("sm_ignorevoice", Command_IgnoreVoice, "Usage: sm_ignorev <#userid|name> | Set target's voice to be ignored.");
+    RegConsoleCmd("sm_ignore_v", Command_IgnoreVoice, "Usage: sm_ignorev <#userid|name> | Set target's voice to be ignored.");
+    RegConsoleCmd("sm_ignorev", Command_IgnoreVoice, "Usage: sm_ignorev <#userid|name> | Set target's voice to be ignored.");
+
+    RegConsoleCmd("sm_unignore_chat", Command_UnIgnoreChat, "Usage: sm_unignorec <#userid|name> | Unignore target's chat.");
+    RegConsoleCmd("sm_unignorechat", Command_UnIgnoreChat, "Usage: sm_unignorec <#userid|name> | Unignore target's chat.");
+    RegConsoleCmd("sm_unignore_c", Command_UnIgnoreChat, "Usage: sm_unignorec <#userid|name> | Unignore target's chat.");
+    RegConsoleCmd("sm_unignorec", Command_UnIgnoreChat, "Usage: sm_unignorec <#userid|name> | Unignore target's chat.");
+
+    RegConsoleCmd("sm_unignore_voice", Command_UnIgnoreVoice, "Usage: sm_unignorev <#userid|name> | Unignore target's voice.");
+    RegConsoleCmd("sm_unignorevoice", Command_UnIgnoreVoice, "Usage: sm_unignorev <#userid|name> | Unignore target's voice.");
+    RegConsoleCmd("sm_unignore_v", Command_UnIgnoreVoice, "Usage: sm_unignorev <#userid|name> | Unignore target's voice.");
+    RegConsoleCmd("sm_unignorev", Command_UnIgnoreVoice, "Usage: sm_unignorev <#userid|name> | Unignore target's voice.");
 }
 
 public OnAllPluginsLoaded()                     //  Check for necessary plugin dependencies and shut down this plugin if not found.
@@ -145,14 +165,14 @@ public Action:OnChatMessage(&author, Handle:recipients, String:name[], String:me
     return Plugin_Changed;
 }
 
-public Action:Command_Ignore(iClient, iArgc)
+public Action:Command_Ignore(iClient, iArgs)
 {
     if (!g_bEnabled || !iClient)
     {
         return Plugin_Handled;
     }
 
-    if (iArgc < 1)
+    if (iArgs < 1)
     {
         Menu_PlayerList(iClient);
         return Plugin_Handled;
@@ -163,21 +183,92 @@ public Action:Command_Ignore(iClient, iArgc)
     return Plugin_Handled;
 }
 
-public Action:Command_UnIgnore(iClient, iArgc)
+public Action:Command_IgnoreChat(iClient, iArgs)
 {
     if (!g_bEnabled || !iClient)
     {
         return Plugin_Handled;
     }
 
-    if (iArgc < 1)
+    if (iArgs < 1)
     {
         Menu_PlayerList(iClient);
-        //ReplyToCommand(client, "[SM] Usage: sm_unignore <#userid|name>");
+        return Plugin_Handled;
+    }
+    
+    ProcessIgnore(iClient, true, _, 1);
+
+    return Plugin_Handled;
+}
+
+public Action:Command_IgnoreVoice(iClient, iArgs)
+{
+    if (!g_bEnabled || !iClient)
+    {
+        return Plugin_Handled;
+    }
+
+    if (iArgs < 1)
+    {
+        Menu_PlayerList(iClient);
+        return Plugin_Handled;
+    }
+
+    ProcessIgnore(iClient, _, true, 2);
+
+    return Plugin_Handled;
+}
+
+public Action:Command_UnIgnore(iClient, iArgs)
+{
+    if (!g_bEnabled || !iClient)
+    {
+        return Plugin_Handled;
+    }
+
+    if (iArgs < 1)
+    {
+        Menu_PlayerList(iClient);
         return Plugin_Handled;
     }
     
     ProcessIgnore(iClient, false, false, 1|2);
+
+    return Plugin_Handled;
+}
+
+public Action:Command_UnIgnoreChat(iClient, iArgs)
+{
+    if (!g_bEnabled || !iClient)
+    {
+        return Plugin_Handled;
+    }
+
+    if (iArgs < 1)
+    {
+        Menu_PlayerList(iClient);
+        return Plugin_Handled;
+    }
+    
+    ProcessIgnore(iClient, false, _, 1);
+
+    return Plugin_Handled;
+}
+
+public Action:Command_UnIgnoreVoice(iClient, iArgs)
+{
+    if (!g_bEnabled || !iClient)
+    {
+        return Plugin_Handled;
+    }
+
+    if (iArgs < 1)
+    {
+        Menu_PlayerList(iClient);
+        return Plugin_Handled;
+    }
+
+    ProcessIgnore(iClient, _, false, 2);
 
     return Plugin_Handled;
 }
